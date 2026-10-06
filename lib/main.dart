@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'receitas.dart';
+import 'tela_informacoes.dart';
 import 'tela_receita.dart';
+import 'tema.dart';
 
 void main() {
   runApp(const ReceitasFavoritasApp());
@@ -15,10 +17,7 @@ class ReceitasFavoritasApp extends StatelessWidget {
     return MaterialApp(
       title: 'Receitas Favoritas',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        scaffoldBackgroundColor: const Color(0xFFF1F8E9),
-      ),
+      theme: temaDoApp,
       home: const TelaPrincipal(),
     );
   }
@@ -33,96 +32,119 @@ class TelaPrincipal extends StatefulWidget {
 
 class _TelaPrincipalState extends State<TelaPrincipal> {
   int _abaSelecionada = 0;
-  final _icones = [Icons.cake, Icons.restaurant, Icons.local_cafe];
+  final _icones = [
+    Icons.icecream_outlined,
+    Icons.lunch_dining_outlined,
+    Icons.emoji_food_beverage_outlined,
+  ];
 
-  void _abrirInformacoes(String titulo, String texto) {
+  void _abrirInformacoes(String titulo, String descricao, String texto) {
     Navigator.pop(context); // Fecha o Drawer.
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(titulo)),
-          body: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              texto,
-              style: const TextStyle(fontSize: 18, height: 1.5),
-            ),
-          ),
-        ),
+        builder: (context) =>
+            TelaInformacoes(titulo: titulo, descricao: descricao, texto: texto),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Receitas Favoritas')),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFFC8E6C9)),
+            Container(
+              color: cores.primaryContainer,
+              padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
               child: Text(
-                'Sabores do interior',
-                style: TextStyle(fontSize: 24),
+                'Receitas Favoritas',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: cores.primary,
+                ),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
+              leading: Icon(Icons.tune_outlined, color: cores.primary),
               title: const Text('Configurações'),
               onTap: () => _abrirInformacoes(
                 'Configurações',
-                'Idioma: Português\n'
-                    'Medidas: xícaras e colheres\n'
-                    'Receitas: 3 por categoria',
+                'Tudo organizado para facilitar a leitura das receitas.',
+                'Idioma\nPortuguês (Brasil)\n\n'
+                    'Medidas nas receitas\nXícaras e colheres\n\n'
+                    'Organização\n3 receitas em cada categoria: '
+                    'doces, salgadas e bebidas.',
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.info_outline),
+              leading: Icon(Icons.info_outline_rounded, color: cores.primary),
               title: const Text('Sobre'),
               onTap: () => _abrirInformacoes(
                 'Sobre',
-                'Sabores do interior\n\n'
-                    'Um caderno de receitas inspirado na comida caseira: '
-                    'doces de panela, lanches simples e bebidas para acompanhar.\n\n'
-                    'Atividade de navegação em Flutter.',
+                'Receitas simples, com aquele gostinho de casa.',
+                'Receitas Favoritas é um pequeno caderno de comida caseira. '
+                    'Aqui você encontra doces, salgados e bebidas, com os '
+                    'ingredientes e o preparo explicados passo a passo.\n\n'
+                    'Este aplicativo foi criado como atividade de estudo '
+                    'para praticar a navegação entre telas no Flutter.',
               ),
             ),
           ],
         ),
       ),
-      body: ListView(
-        key: PageStorageKey(_abaSelecionada),
-        padding: const EdgeInsets.all(16),
-        children: [
-          for (final receita in receitas[_abaSelecionada])
-            Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(12),
-                leading: CircleAvatar(
-                  backgroundColor: const Color(0xFFC8E6C9),
-                  child: Icon(
-                    _icones[_abaSelecionada],
-                    color: Colors.green.shade800,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: ListView(
+            key: PageStorageKey(_abaSelecionada),
+            padding: const EdgeInsets.all(20),
+            children: [
+              for (final receita in receitas[_abaSelecionada])
+                Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    leading: Icon(
+                      _icones[_abaSelecionada],
+                      color: cores.primary,
+                    ),
+                    title: Text(
+                      receita.titulo,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        receita.descricao,
+                        style: TextStyle(
+                          color: cores.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TelaReceita(receita: receita),
+                      ),
+                    ),
                   ),
                 ),
-                title: Text(receita.titulo),
-                subtitle: Text(receita.descricao),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaReceita(receita: receita),
-                  ),
-                ),
-              ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _abaSelecionada,
-        selectedItemColor: Colors.green.shade800,
         onTap: (indice) => setState(() => _abaSelecionada = indice),
         items: [
           for (int i = 0; i < categorias.length; i++)

@@ -3,9 +3,9 @@
     "short_name": "Receitas",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F1F8E9",
-    "theme_color": "#2E7D32",
-    "description": "Sabores do interior: doces, salgadas e bebidas.",
+    "background_color": "#F5F5F5",
+    "theme_color": "#D32F2F",
+    "description": "Receitas de casa: doces, salgadas e bebidas.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
